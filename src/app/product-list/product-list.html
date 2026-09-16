@@ -1,0 +1,99 @@
+<div class="product-list-container">
+  <!-- Hero / Header Section -->
+  <div class="shop-hero">
+    <div class="hero-badge">Alchemical Collection</div>
+    <h2>Magical Potions &amp; Elixirs</h2>
+    <p class="hero-subtitle">
+      Explore our handcrafted potion collection. Each product is clearly marked for allergen presence.
+    </p>
+
+    <!-- Legend & Filter Pills -->
+    <div class="filter-legend-bar">
+      <div class="filter-buttons">
+        <button 
+          class="filter-pill" 
+          [class.active]="selectedFilter === 'all'" 
+          (click)="selectedFilter = 'all'"
+        >
+          All Potions ({{ products.length }})
+        </button>
+        <button 
+          class="filter-pill safe-filter" 
+          [class.active]="selectedFilter === 'safe'" 
+          (click)="selectedFilter = 'safe'"
+        >
+          Allergen-Free ({{ safeCount }})
+        </button>
+        <button 
+          class="filter-pill warning-filter" 
+          [class.active]="selectedFilter === 'allergens'" 
+          (click)="selectedFilter = 'allergens'"
+        >
+          Contains Allergens ({{ allergenCount }})
+        </button>
+      </div>
+
+      <div class="legend-indicators">
+        <span class="legend-item"><span class="legend-box green"></span> Green border = Allergen-Free</span>
+        <span class="legend-item"><span class="legend-box red"></span> Red border = Contains Allergens</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading) {
+    <div class="loading-state">
+      <div class="spinner-ring"></div>
+      <p>Brewing potions...</p>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    @if (filteredProducts.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-box">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.3-4.3"/>
+          </svg>
+        </div>
+        <p>No potions match the selected filter.</p>
+        <button class="btn-reset-filter" (click)="selectedFilter = 'all'">Show All</button>
+      </div>
+    } @else {
+      <!-- Products Grid -->
+      <div class="products-grid">
+        @for (product of filteredProducts; track product.id; let i = $index) {
+          <app-product-item 
+            [product]="product" 
+            [index]="i" 
+            (addToCartEvent)="onAddToCart($event)"
+          >
+            <p class="position-info">#{{ i + 1 }} in catalog</p>
+          </app-product-item>
+        }
+      </div>
+    }
+  }
+
+  <!-- Sticky Bottom Cart Summary Bar -->
+  <div class="cart-summary-bar" *ngIf="cartService.totalItems() > 0">
+    <div class="summary-details">
+      <div class="summary-cart-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="21" r="1"/>
+          <circle cx="19" cy="21" r="1"/>
+          <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="summary-items-count">{{ cartService.totalItems() }} {{ cartService.totalItems() === 1 ? 'item' : 'items' }} in cart</div>
+        <div class="summary-total-price">Total: <strong>{{ cartService.totalPrice() | currency: 'EUR' }}</strong></div>
+      </div>
+    </div>
+    <button class="btn-checkout-bar" routerLink="/cart">
+      View Cart &amp; Checkout &rarr;
+    </button>
+  </div>
+</div>
+
+

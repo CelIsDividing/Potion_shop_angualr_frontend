@@ -1,0 +1,237 @@
+.product-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+/* ========================================================
+   ALLERGEN STYLING: Red border vs Green border
+   ======================================================== */
+
+/* 1. Product WITH allergens -> Red border */
+.card-has-allergens {
+  border: 2.5px solid #ef4444 !important;
+  background: linear-gradient(180deg, #fffafa 0%, #ffffff 60%);
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.14);
+}
+
+.card-has-allergens:hover {
+  border-color: #dc2626 !important;
+  box-shadow: 0 12px 28px rgba(239, 68, 68, 0.25);
+}
+
+/* 2. Product WITHOUT allergens -> Green border */
+.card-allergen-free {
+  border: 2.5px solid #10b981 !important;
+  background: linear-gradient(180deg, #f7fdf9 0%, #ffffff 60%);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.14);
+}
+
+.card-allergen-free:hover {
+  border-color: #059669 !important;
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.25);
+}
+
+/* Header & Status Pill */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.potion-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #f5f3ff;
+  color: #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.allergen-status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.allergen-status-pill.warning {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
+.allergen-status-pill.safe {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.allergen-status-pill.warning .status-dot {
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+}
+
+.allergen-status-pill.safe .status-dot {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+/* Card Body */
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 6px 0;
+}
+
+.description {
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin-bottom: 12px;
+  flex: 1;
+}
+
+.meta-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.meta-item {
+  font-size: 0.78rem;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* Allergens container */
+.allergens-box {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 16px;
+}
+
+.allergens-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #b91c1c;
+  margin-bottom: 4px;
+}
+
+.allergen-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.allergen-tag {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.safe-box {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin-bottom: 16px;
+}
+
+.safe-note {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+/* Footer & Actions */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.price-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.price-label {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.price-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #2d1b4e;
+}
+
+.btn-add-cart {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6);
+  color: white;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(124, 58, 237, 0.3);
+  transition: all 0.2s;
+}
+
+.btn-add-cart:hover {
+  background: linear-gradient(135deg, #6d28d9, #4c1d95);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 14px rgba(124, 58, 237, 0.4);
+}
+
+.btn-add-cart:active {
+  transform: translateY(0);
+}

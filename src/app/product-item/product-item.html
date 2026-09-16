@@ -1,0 +1,65 @@
+<div [ngClass]="productClasses">
+  <!-- Potion Header & Status Indicator -->
+  <div class="card-header">
+    <div class="potion-icon-wrapper">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 2v3a4 4 0 0 0-1.5 3.2L4.3 16.5A4 4 0 0 0 7.8 22h8.4a4 4 0 0 0 3.5-5.5L15.5 8.2A4 4 0 0 0 14 5V2"/>
+        <path d="M8.5 2h7"/>
+        <path d="M7 16h10"/>
+      </svg>
+    </div>
+
+    <!-- Dynamic Allergen Status Badge -->
+    <div class="allergen-status-pill" [class.warning]="hasAllergens" [class.safe]="!hasAllergens">
+      @if (hasAllergens) {
+        <span class="status-dot"></span>
+        <span class="status-text">Allergens ({{ allergenCount }})</span>
+      } @else {
+        <span class="status-dot"></span>
+        <span class="status-text">Allergen-Free</span>
+      }
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="card-body">
+    <h3 class="product-title">{{ product().name }}</h3>
+    <p class="description">{{ product().description }}</p>
+    
+    <div class="meta-row">
+      <span class="meta-item">Size: {{ product().size }}</span>
+      <span class="meta-item">{{ product().calories }} kcal</span>
+    </div>
+
+    <!-- Allergen Tags List if present -->
+    @if (hasAllergens) {
+      <div class="allergens-box">
+        <span class="allergens-label">Contains:</span>
+        <div class="allergen-tags">
+          @for (allergen of product().allergens; track allergen.id) {
+            <span class="allergen-tag">{{ allergen.name }}</span>
+          }
+        </div>
+      </div>
+    } @else {
+      <div class="safe-box">
+        <span class="safe-note">Safe for sensitive wizards</span>
+      </div>
+    }
+  </div>
+
+  <!-- Footer Actions -->
+  <div class="card-footer">
+    <div class="price-box">
+      <span class="price-label">Price</span>
+      <span class="price-value">{{ product().price | currency: 'EUR' }}</span>
+    </div>
+    <button class="btn-add-cart" (click)="onAdd()">
+      <span>+ Add to Cart</span>
+    </button>
+  </div>
+
+  <ng-content></ng-content>
+</div>
+
+

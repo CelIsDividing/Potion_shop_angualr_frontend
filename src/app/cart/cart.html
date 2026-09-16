@@ -1,0 +1,309 @@
+<div class="cart-container">
+  <div class="cart-header-title">
+    <h2>Your Potion Cart</h2>
+    <p class="cart-subtitle">
+      Review your selected elixirs before completing your order and payment.
+    </p>
+  </div>
+
+  @if (cartService.getItems().length === 0) {
+    <div class="empty-cart-card">
+      <div class="empty-cart-icon">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="8" cy="21" r="1" />
+          <circle cx="19" cy="21" r="1" />
+          <path
+            d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"
+          />
+        </svg>
+      </div>
+      <h3>Your cart is currently empty</h3>
+      <p>Add some magical potions from our catalog to get started.</p>
+      <a routerLink="/products" class="btn-back-shop">&larr; Back to Potion Catalog</a>
+    </div>
+  } @else {
+    <div class="cart-items">
+      @for (item of cartService.getItems(); track $index; let i = $index) {
+        <div class="cart-item">
+          <div class="item-info">
+            <h4>{{ item.product.name }}</h4>
+            <div class="item-meta">
+              <span class="qty-badge">Qty: {{ item.quantity }}</span>
+              <span class="unit-price">({{ item.product.price | currency: 'EUR' }} each)</span>
+            </div>
+            @if (item.extras && item.extras.length) {
+              <p class="extras">Extras: {{ item.extras.map((e) => e.extraName).join(', ') }}</p>
+            }
+          </div>
+          <div class="item-price">
+            <p>{{ item.totalPrice | currency: 'EUR' }}</p>
+            <button (click)="removeItem(i)" class="btn-remove-item">Remove</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="cart-total">
+      <div class="cart-total-info">
+        <span class="total-label">Cart Subtotal:</span>
+        <span class="total-value">{{ cartService.totalPrice() | currency: 'EUR' }}</span>
+      </div>
+      <div class="cart-total-actions">
+        <button class="clear-btn" (click)="clearCart()">Clear Cart</button>
+        <button class="checkout-btn" (click)="openPaymentModal()">Proceed to Payment</button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Modal Popup for payment -->
+<div class="modal-backdrop" *ngIf="showPaymentModal" (click)="closePaymentModal()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <button class="modal-close-btn" (click)="closePaymentModal()" [disabled]="isProcessing">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+
+    <!-- Payment Successful View -->
+    <div *ngIf="paymentSuccess" class="payment-success-view">
+      <div class="success-icon">
+        <svg
+          width="48"
+          height="48"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#16a34a"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
+      </div>
+      <h3>Payment Successful!</h3>
+      <p class="order-ref">
+        Order <strong>#{{ completedOrderId }}</strong> has been successfully placed and paid.
+      </p>
+      <div class="success-loyalty" *ngIf="earnedPoints > 0">
+        You earned <strong>+{{ earnedPoints }}</strong> loyalty points for this purchase!
+      </div>
+      <button class="btn-continue" routerLink="/products" (click)="closePaymentModal()">
+        Back to Catalog
+      </button>
+    </div>
+
+    <!-- Card form and selection -->
+    <div *ngIf="!paymentSuccess" class="payment-flow-view">
+      <div class="modal-header">
+        <h3>Credit Card Payment</h3>
+        <p class="modal-subtitle">
+          Select a saved card or enter new card details to complete your order.
+        </p>
+      </div>
+
+      <!-- Price Breakdown -->
+      <div class="summary-box">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span>{{ subtotal | currency: 'EUR' }}</span>
+        </div>
+        <div class="summary-row discount-row" *ngIf="discountPercent > 0">
+          <span>Loyalty Discount ({{ loyaltyTierName }} - {{ discountPercent }}%):</span>
+          <span>-{{ discountAmount | currency: 'EUR' }}</span>
+        </div>
+        <div class="summary-row total-row">
+          <strong>Total to Pay:</strong>
+          <strong class="total-amount">{{ finalTotal | currency: 'EUR' }}</strong>
+        </div>
+      </div>
+
+      <!-- Payment mode selector tabs -->
+      <div class="mode-selector">
+        <button
+          type="button"
+          class="mode-tab-btn"
+          [class.active]="selectedCardMode === 'existing'"
+          (click)="selectedCardMode = 'existing'"
+          *ngIf="savedCards.length > 0"
+        >
+          Saved Cards ({{ savedCards.length }})
+        </button>
+        <button
+          type="button"
+          class="mode-tab-btn"
+          [class.active]="selectedCardMode === 'new'"
+          (click)="switchToNewCard()"
+        >
+          New Card
+        </button>
+      </div>
+
+      <!-- 1. Saved Cards Section -->
+      <div *ngIf="selectedCardMode === 'existing'" class="saved-cards-section">
+        <div *ngIf="isLoadingCards" class="loading-cards">
+          <span>Loading your saved cards...</span>
+        </div>
+
+        <div class="saved-cards-list" *ngIf="!isLoadingCards">
+          <div
+            *ngFor="let card of savedCards"
+            class="saved-card-item"
+            [class.selected]="selectedCardId === card.id"
+            (click)="selectExistingCard(card.id)"
+          >
+            <div class="card-radio">
+              <input
+                type="radio"
+                name="savedCard"
+                [checked]="selectedCardId === card.id"
+                (change)="selectExistingCard(card.id)"
+              />
+            </div>
+            <div class="card-details">
+              <div class="card-num-preview">**** **** **** {{ card.lastFourDigits }}</div>
+              <div class="card-sub-preview">
+                <span class="card-holder-name">{{ card.cardHolder }}</span>
+                <span class="card-exp-date"
+                  >Expires: {{ card.expiryMonth }}/{{ card.expiryYear }}</span
+                >
+              </div>
+            </div>
+            <button
+              type="button"
+              class="btn-delete-card"
+              title="Delete card"
+              (click)="deleteCard($event, card.id)"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M3 6h18" />
+                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. New Card Form -->
+      <div *ngIf="selectedCardMode === 'new'" class="new-card-section">
+        <form [formGroup]="cardForm" class="angular-card-form">
+          <div class="form-group">
+            <label for="cardHolder">Cardholder Name</label>
+            <input
+              id="cardHolder"
+              type="text"
+              formControlName="cardHolder"
+              placeholder="e.g. John Doe"
+              [class.input-error]="isFieldInvalid('cardHolder')"
+            />
+            <span class="error-msg" *ngIf="isFieldInvalid('cardHolder')">
+              Cardholder name is required (min. 2 characters).
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label for="cardNumber">Credit Card Number</label>
+            <input
+              id="cardNumber"
+              type="text"
+              formControlName="cardNumber"
+              placeholder="16 digits without spaces"
+              maxlength="16"
+              (input)="onCardNumberInput($event)"
+              [class.input-error]="isFieldInvalid('cardNumber')"
+            />
+            <span class="error-msg" *ngIf="isFieldInvalid('cardNumber')">
+              Card number must contain exactly 16 digits.
+            </span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-col">
+              <label for="expiryMonth">Month</label>
+              <select id="expiryMonth" formControlName="expiryMonth">
+                <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+              </select>
+            </div>
+
+            <div class="form-col">
+              <label for="expiryYear">Year</label>
+              <select id="expiryYear" formControlName="expiryYear">
+                <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+              </select>
+            </div>
+
+            <div class="form-col">
+              <label for="cvv">CVV</label>
+              <input
+                id="cvv"
+                type="password"
+                formControlName="cvv"
+                placeholder="123"
+                maxlength="4"
+                (input)="onCvvInput($event)"
+                [class.input-error]="isFieldInvalid('cvv')"
+              />
+              <span class="error-msg" *ngIf="isFieldInvalid('cvv')"> CVV must be 3-4 digits. </span>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Error Alert -->
+      <div *ngIf="paymentError" class="payment-error-alert">
+        {{ paymentError }}
+      </div>
+
+      <!-- Modal Actions -->
+      <div class="modal-actions">
+        <button
+          type="button"
+          class="btn-cancel"
+          (click)="closePaymentModal()"
+          [disabled]="isProcessing"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn-pay-submit"
+          (click)="confirmPayment()"
+          [disabled]="isProcessing"
+        >
+          <span *ngIf="!isProcessing">Pay {{ finalTotal | currency: 'EUR' }}</span>
+          <span *ngIf="isProcessing">Processing payment...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

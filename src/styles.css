@@ -1,1 +1,82 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles & Variables */
+:root {
+  --primary: #4c1d95;
+  --primary-light: #7c3aed;
+  --primary-dark: #2e1065;
+  --accent: #f59e0b;
+  --accent-glow: rgba(245, 158, 11, 0.3);
+  
+  --allergen-red: #ef4444;
+  --allergen-red-border: #f87171;
+  --allergen-red-bg: #fff5f5;
+  --allergen-red-badge: #fee2e2;
+  --allergen-red-text: #991b1b;
+  
+  --safe-green: #10b981;
+  --safe-green-border: #34d399;
+  --safe-green-bg: #f0fdf4;
+  --safe-green-badge: #dcfce7;
+  --safe-green-text: #166534;
+  
+  --bg-main: #f8fafc;
+  --card-bg: #ffffff;
+  --text-main: #1e1b4b;
+  --text-muted: #64748b;
+  --border-light: #e2e8f0;
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.25);
+  
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
+  color: var(--text-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Utility Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
