@@ -1,0 +1,35 @@
+[build]
+  command = "npm run build"
+  publish = "dist/potion-shop/browser"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/catalog-service/*"
+  to = "https://potionshop-gateway.onrender.com/catalog-service/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/user-service/*"
+  to = "https://potionshop-gateway.onrender.com/user-service/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/order-service/*"
+  to = "https://potionshop-gateway.onrender.com/order-service/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/payment-service/*"
+  to = "https://potionshop-gateway.onrender.com/payment-service/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
